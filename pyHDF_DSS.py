@@ -20,10 +20,10 @@ import h5py
 import matplotlib.pyplot as plt
 
 # User input:
-hdf_filename = r"C:/Users/lelekew/Documents/Yolo_Bypass/RAS_Projects/YoloBypass_2016.p15.hdf"
-obs_dss = r'C:/Users/lelekew/Documents/Yolo_Bypass/DSS_Files/Internal_Calibration_Tomkovic_SI_DatumAdjust.dss'
-twoD_dss = r"C:/Users/lelekew/Documents/Yolo_Bypass/DSS_Files/2D_Hydrographs.dss"
-plot_dir = r'C:/Users/lelekew/Documents/Yolo_Bypass/Model_Plots'
+hdf_filename = r"C:/Users/lelekew/Documents/Python/Example RAS/Example Projects/2D Unsteady Flow Hydraulics/BaldEagleCrkMulti2D/BaldEagleDamBrk.p03.hdf" 
+obs_dss = r'C:/Users/lelekew/Documents/Python/FinalFolder/Tutorial/BaldCreekObservedData.dss' 
+twoD_dss = r"C:/Users/lelekew/Documents/Python/FinalFolder/Tutorial/BaldCreek2D.dss" 
+plot_dir = r'C:\Users\lelekew\Documents\Python\Figures' 
 
 working_directory = os.path.dirname(os.path.realpath(__file__))
 
