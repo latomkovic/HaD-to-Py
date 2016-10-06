@@ -20,10 +20,10 @@ import h5py
 import matplotlib.pyplot as plt
 
 # User input:
-hdf_filename = r"C:/Users/lelekew/Documents/Python/Example RAS/Example Projects/2D Unsteady Flow Hydraulics/BaldEagleCrkMulti2D/BaldEagleDamBrk.p03.hdf"
-obs_dss = r'C:/Users/lelekew/Documents/Python/FinalFolder/Tutorial/BaldCreekObservedData.dss'
-twoD_dss = r"C:/Users/lelekew/Documents/Python/FinalFolder/Tutorial/BaldCreek2D.dss"
-plot_dir = r'C:\Users\lelekew\Documents\Python\Figures'
+hdf_filename = r"C:/Users/lelekew/Documents/Python/Example RAS/Example Projects/2D Unsteady Flow Hydraulics/BaldEagleCrkMulti2D/BaldEagleDamBrk.p03.hdf" 
+obs_dss = r'C:/Users/lelekew/Documents/Python/FinalFolder/Tutorial/BaldCreekObservedData.dss' 
+twoD_dss = r"C:/Users/lelekew/Documents/Python/FinalFolder/Tutorial/BaldCreek2D.dss" 
+plot_dir = r'C:\Users\lelekew\Documents\Python\Figures' 
 
 working_directory = os.path.dirname(os.path.realpath(__file__))
 
@@ -216,8 +216,14 @@ def findNearestCell(hf,AreaName,gageCoord):
         else:
             i+=1
             continue
-    CellInd = indices[np.where(distances==min(distances))] # Choose the index that's left with the shortest distance
-    CellDist = distances[np.where(distances==min(distances))]  # Displays the distance left      
+    if indices.size: # If the indices list is not empty
+        CellInd = indices[np.where(distances==min(distances))] # Choose the index that's left with the shortest distance
+        CellDist = distances[np.where(distances==min(distances))]  # Displays the distance left
+    else:
+        CellInd = [0] # Be careful of this
+        CellDist = [9999] # Seeing this value in the Distances array will notify you that none of the cells in the 2D flow area were associated with a cell point. 
+                        # This is likely because the gage coordinates are too far from a 2D area to be considered "close" to a cell point 
+                        # and so face points are all that are being rendered as "close"
     return CellInd[0], CellDist[0]  # The index of the cell center which is closest to the gage coordinates
 
 # Finds the absolute closest cell to the gage coordinates given. Returns the cell index to be used to access
@@ -265,10 +271,11 @@ def find_2D_indices(working_directory,hdf_filename):
 def get_2D_indices(working_directory,hdf_filename):
     temp_file_dir = working_directory + "\\temp_files"
     if not os.path.exists(temp_file_dir): os.makedirs(temp_file_dir)
-    if not os.path.isfile(temp_file_dir + "\\ras_2D_cells.txt"): open(temp_file_dir+"\\ras_2D_cells.txt",'w')
+    if not os.path.isfile(temp_file_dir + "\\ras_2D_cells.txt"): indices_file= open(temp_file_dir+"\\ras_2D_cells.txt",'w')
     indices_file = open(working_directory + "\\temp_files\\ras_2D_cells.txt", 'r+')
     lines = indices_file.readlines()
-    if len(lines)==0:
+    indices_file.close()
+    if len(lines)<2:
         headline = ''
     else:
         headline = lines[0]
@@ -443,17 +450,15 @@ def get_all_plot_data(working_directory, obs_dss, twoD_dss, hdf_filename):
         
             
     # Get all the 1D Data
-    one_dim_comp_path_file = open(working_directory + "\\one_dim_comp_paths.txt", 'r')
-    if len(one_dim_comp_path_file.readlines()) == 0:
-        dummy_variable = False
-    else:    
+    if os.path.isfile(working_directory + "\one_dim_comp_paths.txt"):
+        one_dim_comp_path_file = open(working_directory + "\one_dim_comp_paths.txt", 'r+')
         for line in one_dim_comp_path_file:
             key = line.partition('Gage: ')[-1].rpartition(' Path:')[0]
             comp_path = line.partition('Path: ')[-1].rpartition('\n')[0]
             comp_path = comp_path %(Dpart, outp_interval, shortID)
             obs_path = get_obs_path(key)
             ras_computed_WSE[key], time_strings_comp[key], time_minutes_comp[key] = get_DSS_data(ras_dss, temp_output_filename, comp_path, start_time, end_time)
-            observed_WSE[key], time_strings_obs[key], time_minutes_obs[key] = get_DSS_data(obs_dss, temp_output_filename, obs_path,start_time, end_time)    
+            observed_WSE[key], time_strings_obs[key], time_minutes_obs[key] = get_DSS_data(obs_dss, temp_output_filename, obs_path,start_time, end_time)
     one_dim_comp_path_file.close()
     
     return ras_computed_WSE, observed_WSE, time_strings_comp, time_minutes_comp, time_strings_obs, time_minutes_obs
